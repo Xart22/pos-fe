@@ -1,11 +1,11 @@
-import { DataTable } from "./data-table";
-import FormCreateCategories from "./form-create";
+import { Metadata } from "next";
+import FormCreateCategories from "./form-page";
 
-export default function FormPage() {
-  return (
-    <div className="border">
-      <FormCreateCategories />
-      <DataTable columns={[]} data={[]} />
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "Manage Categories",
+  description: "Manage categories for your products",
+};
+
+export default function CategoriesPage() {
+  return <FormCreateCategories />;
 }

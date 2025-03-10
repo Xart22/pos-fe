@@ -26,7 +26,7 @@ const items = [
       },
       {
         title: "Variants",
-        url: "#",
+        url: "/variants",
       },
     ],
   },

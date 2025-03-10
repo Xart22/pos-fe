@@ -19,13 +19,11 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onFetchData?: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  onFetchData,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
