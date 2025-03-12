@@ -5,16 +5,13 @@ import { Categories } from "./categoriesSchema";
 export const menuSchema = z.object({
   id: z.number().int().optional(),
   name: z.string().min(2, { message: "Nama harus minimal 2 karakter" }),
-  image: z.string().min(1, { message: "Gambar harus diisi" }),
+  image: z.instanceof(File).refine((file) => file.size < 2000000, {
+    message: "Ukuran file tidak boleh lebih dari 2MB",
+  }),
   description: z.string().min(1, { message: "Deskripsi harus diisi" }),
   price: z.string().min(1, { message: "Harga harus diisi" }),
   category: z.string().min(1, { message: "Kategori harus dipilih" }),
-  variants: z.array(
-    z.object({
-      id: z.number().optional(),
-      name: z.string().min(1, { message: "Nama harus diisi" }),
-    })
-  ),
+  variants: z.array(z.string()).min(1, { message: "Variant harus dipilih" }),
   stock: z.string().min(1, { message: "Stok harus diisi" }),
   is_active: z.boolean(),
   is_online: z.boolean(),
@@ -24,7 +21,14 @@ export const fieldsMenu: {
   name: string;
   label: string;
   placeholder?: string;
-  type?: "text" | "number" | "array" | "select" | "textarea" | "file";
+  type?:
+    | "text"
+    | "number"
+    | "array"
+    | "select"
+    | "textarea"
+    | "file"
+    | "checkbox";
   options?: Variant[] | Categories[];
 }[] = [
   {
@@ -49,7 +53,7 @@ export const fieldsMenu: {
     name: "price",
     label: "Harga",
     placeholder: "Masukkan harga menu",
-    type: "number",
+    type: "text",
   },
   {
     name: "category",
@@ -60,7 +64,8 @@ export const fieldsMenu: {
   {
     name: "variants",
     label: "Variant",
-    type: "select",
+    type: "array",
+    placeholder: "Pilih variant",
     options: [],
   },
   {
@@ -72,12 +77,12 @@ export const fieldsMenu: {
   {
     name: "is_active",
     label: "Aktif",
-    type: "text",
+    type: "checkbox",
   },
   {
     name: "is_online",
     label: "Online",
-    type: "text",
+    type: "checkbox",
   },
 ];
 

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import FormPage from "./form-page";
+import MenuForm from "./form-page";
 
 export const metadata: Metadata = {
   title: "Manage Menu",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Menu() {
-  return <FormPage />;
+  return <MenuForm />;
 }
