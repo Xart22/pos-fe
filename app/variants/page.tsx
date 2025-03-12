@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function VariantPage() {
-  return <VariantForm />;
+  return (
+    <>
+      <VariantForm />
+    </>
+  );
 }
