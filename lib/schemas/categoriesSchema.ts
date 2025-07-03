@@ -3,6 +3,7 @@ import * as z from "zod";
 export const formSchema = z.object({
   id: z.number().int().optional(),
   name: z.string().min(2, { message: "Nama minimal 2 karakter" }),
+  icon: z.string().optional(),
 });
 
 export const fieldsCategories: {

@@ -1,11 +1,12 @@
+// BaseForm.tsx
 import {
   useForm,
+  Controller,
   FieldValues,
   DefaultValues,
-  Path,
-  PathValue,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,13 +17,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { z } from "zod";
+import { Textarea } from "@/components/ui/textarea";
+import Select from "react-select";
+
+type Option = { label: string; value: string };
+
+interface FieldConfig<T extends FieldValues> {
+  name: keyof T;
+  label: string;
+  placeholder?: string;
+  type?: "text" | "number" | "textarea" | "select";
+  options?: Option[];
+}
 
 interface BaseFormProps<T extends FieldValues> {
   schema: z.ZodType<T>;
-  defaultValues?: DefaultValues<T>; // ✅ Pastikan tipe sudah sesuai
-  onSubmit: (data: T) => Promise<void>;
-  fields: { name: keyof T; label: string; placeholder?: string }[];
+  defaultValues?: DefaultValues<T>;
+  onSubmit: (data: T) => void | Promise<void>;
+  fields: FieldConfig<T>[];
 }
 
 export default function BaseForm<T extends FieldValues>({
@@ -36,22 +48,11 @@ export default function BaseForm<T extends FieldValues>({
     defaultValues: defaultValues ?? ({} as DefaultValues<T>),
   });
 
-  const handleSubmit = async () => {
-    try {
-      await onSubmit(form.getValues());
-      fields.forEach((field) =>
-        form.setValue(field.name as Path<T>, "" as PathValue<T, Path<T>>)
-      );
-    } catch (error) {
-      console.error("Submit error:", error);
-    }
-  };
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4 p-6 w-full  rounded-lg shadow-md max-w-md"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 p-6 max-w-md  rounded-lg shadow-md"
       >
         {fields.map((field) => (
           <FormField
@@ -62,7 +63,36 @@ export default function BaseForm<T extends FieldValues>({
               <FormItem>
                 <FormLabel>{field.label}</FormLabel>
                 <FormControl>
-                  <Input placeholder={field.placeholder} {...inputField} />
+                  {field.type === "textarea" ? (
+                    <Textarea {...inputField} placeholder={field.placeholder} />
+                  ) : field.type === "select" && field.options ? (
+                    <Controller
+                      name={field.name as any}
+                      control={form.control}
+                      render={({ field: selectField }) => (
+                        <Select
+                          options={field.options}
+                          value={field.options?.find(
+                            (opt) => opt.value === selectField.value
+                          )}
+                          onChange={(val) => selectField.onChange(val?.value)}
+                          placeholder={field.placeholder}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <Input
+                      {...inputField}
+                      type={field.type === "number" ? "number" : "text"}
+                      //uppercase value={String(inputField.value)}
+                      value={
+                        field.name === "kode" && inputField.value
+                          ? String(inputField.value).toUpperCase()
+                          : inputField.value
+                      }
+                      placeholder={field.placeholder}
+                    />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>

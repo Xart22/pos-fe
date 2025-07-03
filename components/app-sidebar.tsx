@@ -28,6 +28,14 @@ const items = [
         title: "Variants",
         url: "/variants",
       },
+      {
+        title: "Ingredients",
+        url: "/ingredients",
+      },
+      {
+        title: "Recipes",
+        url: "/recipes",
+      },
     ],
   },
 

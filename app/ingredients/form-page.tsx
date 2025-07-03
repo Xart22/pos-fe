@@ -5,23 +5,22 @@ import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
 import {
   formSchema,
-  Categories,
-  fieldsCategories,
-} from "@/lib/schemas/categoriesSchema";
+  Ingredients,
+  fieldsIngredients,
+} from "@/lib/schemas/ingredientsSchema";
 import BaseForm from "@/components/baseform";
 import { ColumnDef } from "@tanstack/react-table";
 import { ModalForm } from "./modal-form";
 
 export default function FormPage() {
-  const [data, setData] = useState<Categories[]>([]);
+  const [data, setData] = useState<Ingredients[]>([]);
 
   const getData = async () => {
     try {
-      const response = await ApiClient.get("/categories");
+      const response = await ApiClient.get("/ingredients");
 
       if (response.status === 200) {
-        console.log("Data fetched successfully:", response.data.categories);
-        setData(response.data.categories);
+        setData(response.data.data);
       } else {
         console.error("Error fetching data:", response.data);
       }
@@ -30,12 +29,12 @@ export default function FormPage() {
     }
   };
 
-  const onSubmit = async (data: Categories) => {
+  const onSubmit = async (data: Ingredients) => {
     try {
-      const response = await ApiClient.post("/categories/store", data);
+      const response = await ApiClient.post("/ingredients/store", data);
       if (response.status === 200) {
         console.log("Data berhasil disimpan");
-        getData();
+        await getData();
       } else {
         console.error("Error saving data:", response.data);
       }
@@ -44,14 +43,14 @@ export default function FormPage() {
     }
   };
 
-  const onSubmitEdit = async (data: Categories): Promise<void> => {
+  const onSubmitEdit = async (data: Ingredients): Promise<void> => {
     try {
-      const response = await ApiClient.post(`/categories/update/${data.id}`, {
+      const response = await ApiClient.post(`/ingredients/update/${data.id}`, {
         name: data.name,
       });
       if (response.status === 200) {
         console.log("Data berhasil diubah");
-        getData();
+        await getData();
       } else {
         console.error("Error saving data:", response.data);
       }
@@ -60,12 +59,12 @@ export default function FormPage() {
     }
   };
 
-  const onSubmitDelete = async (data: Categories): Promise<void> => {
+  const onSubmitDelete = async (data: Ingredients): Promise<void> => {
     try {
-      const response = await ApiClient.delete(`/categories/delete/${data.id}`);
+      const response = await ApiClient.delete(`/ingredients/delete/${data.id}`);
       if (response.status === 200) {
         console.log("Data berhasil diubah");
-        getData();
+        await getData();
       } else {
         console.error("Error saving data:", response.data);
       }
@@ -74,10 +73,30 @@ export default function FormPage() {
     }
   };
 
-  const columns: ColumnDef<Categories>[] = [
+  const columns: ColumnDef<Ingredients>[] = [
+    {
+      accessorKey: "kode",
+      header: "Kode Bahan",
+    },
     {
       accessorKey: "name",
       header: "Name",
+    },
+    {
+      accessorKey: "harga",
+      header: "Harga",
+    },
+    {
+      accessorKey: "stock",
+      header: "Stok",
+    },
+    {
+      accessorKey: "satuan",
+      header: "Satuan",
+    },
+    {
+      accessorKey: "description",
+      header: "Deskripsi",
     },
     {
       header: "Actions",
@@ -91,14 +110,14 @@ export default function FormPage() {
               type={"edit"}
               onSubmit={onSubmitEdit}
               formSchema={formSchema}
-              fieldsCategories={fieldsCategories}
+              fieldsCategories={fieldsIngredients}
               defaultValues={categories}
             />
             <ModalForm
               type={"delete"}
               onSubmit={onSubmitDelete}
               formSchema={formSchema}
-              fieldsCategories={fieldsCategories}
+              fieldsCategories={fieldsIngredients}
               defaultValues={categories}
             />
           </div>
@@ -112,13 +131,23 @@ export default function FormPage() {
   }, []);
 
   return (
-    <div className="flex flex-col space-y-4 p-6 w-full  md:space-y-0 md:flex-row md:space-x-4">
+    <div className="flex flex-col space-y-4 p-6 w-full md:w-3/4 lg:w-2/3 md:flex-row md:space-x-4">
       <BaseForm
         schema={formSchema}
         onSubmit={onSubmit}
-        fields={fieldsCategories}
+        fields={fieldsIngredients.map(({ type, ...rest }) => ({
+          ...rest,
+          type:
+            type === "number" ||
+            type === "text" ||
+            type === "textarea" ||
+            type === "select" ||
+            typeof type === "undefined"
+              ? type
+              : undefined,
+        }))}
       />
-      <div className=" overflow-auto rounded-lg shadow-md p-6">
+      <div className="rounded-lg shadow-md p-6">
         <DataTable columns={columns} data={data} onFetchData={getData} />
       </div>
     </div>
